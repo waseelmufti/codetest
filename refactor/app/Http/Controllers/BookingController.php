@@ -7,6 +7,7 @@ use DTApi\Http\Requests;
 use DTApi\Models\Distance;
 use Illuminate\Http\Request;
 use DTApi\Repository\BookingRepository;
+use DTApi\Http\Requests\BookingRequest;
 
 /**
  * Class BookingController
@@ -35,13 +36,11 @@ class BookingController extends Controller
      */
     public function index(Request $request)
     {
+        $response = null;
+
         if($user_id = $request->get('user_id')) {
-
             $response = $this->repository->getUsersJobs($user_id);
-
-        }
-        elseif($request->__authenticatedUser->user_type == env('ADMIN_ROLE_ID') || $request->__authenticatedUser->user_type == env('SUPERADMIN_ROLE_ID'))
-        {
+        }elseif(in_array($request->__authenticatedUser->user_type, [config('roles.ADMIN_ROLE_ID'), config('roles.SUPERADMIN_ROLE_ID')])){
             $response = $this->repository->getAll($request);
         }
 
@@ -63,7 +62,7 @@ class BookingController extends Controller
      * @param Request $request
      * @return mixed
      */
-    public function store(Request $request)
+    public function store(BookingRequest $request)
     {
         $data = $request->all();
 
